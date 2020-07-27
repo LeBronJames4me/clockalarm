@@ -73,10 +73,14 @@ class CWidget(QWidget):
         hbox = QHBoxLayout()
         btnAdd = QPushButton('Add List')
         btnDel = QPushButton('Del List')
+        btnLoad = QPushButton('Load Setting')
         btnAdd.clicked.connect(self.addList)
         btnDel.clicked.connect(self.delList)
+        btnLoad.clicked.connect(self.loadList)
         hbox.addWidget(btnAdd)
         hbox.addWidget(btnDel)
+        hbox.addWidget(btnLoad)
+
 
         box.addLayout(hbox)
         gb.setLayout(box)
@@ -136,7 +140,6 @@ class CWidget(QWidget):
         self.showtime()
         gb.setLayout(box)
 
-
         self.setLayout(vbox)
         self.show()
 
@@ -161,16 +164,9 @@ class CWidget(QWidget):
         row = self.table.rowCount()  # 이전 누적 수
         self.table.setRowCount(row + cnt)
 
-        '''for i in range(row, row + cnt):
-            self.table.setItem(i, 0, QTableWidgetItem(files[0][i - row]))
-            pbar = QProgressBar(self.table)
-            pbar.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(i, 1, pbar)'''
-
         for i in range(row, row + cnt):
 
             self.table.setItem(i, 0, QTableWidgetItem(files[0][i - row]))
-
             self.table.setItem(i, 1, QTableWidgetItem('-'))
 
             #self.input_hour = QLineEdit()
@@ -181,8 +177,6 @@ class CWidget(QWidget):
             self.pbar.setAlignment(Qt.AlignCenter)
             #self.table.setCellWidget(i, 2, self.pbar)
             self.table.setItem(i, 2, QTableWidgetItem(''))
-
-
 
         self.createPlaylist()
 
@@ -200,6 +194,23 @@ class CWidget(QWidget):
 
         self.createPlaylist()
 
+    def loadList(self):
+
+        f = open('settings.csv', 'r', encoding='utf-8')
+        rdr = csv.reader(f)
+
+        for line in rdr:
+            row = self.table.rowCount()
+            self.table.setRowCount(1+row)
+            i = int(line[0])
+            self.table.setItem(i, 0, QTableWidgetItem(line[1]))
+            self.table.setItem(i, 1, QTableWidgetItem(line[2]))
+            self.table.setItem(i, 2, QTableWidgetItem(''))
+        f.close()
+        self.createPlaylist()
+
+
+
     def btnClicked(self, id):
 
         if id == 0:# play
@@ -214,14 +225,9 @@ class CWidget(QWidget):
     def tableDbClicked(self, e):
         #self.player.play(self.playlist, self.selectedList[0], self.playOption)
 
-        if os.path.exists('settings.csv'):
-            print("Something exist")
-
-        f = open('settings.csv', 'w', encoding='utf-8')
+        f = open('settings.csv', 'w', encoding='utf-8', newline='')
         wr = csv.writer(f)
-        wr.writerow([1, "Alice", True])
-        wr.writerow([2, "Bob", False])
-        f.close()
+
 
         timeVar = self.settimer.time()
         time_hour = timeVar.hour()
@@ -240,15 +246,13 @@ class CWidget(QWidget):
         row = self.table.rowCount()
 
         for i in range(0, row):
-            #print(self.table.item(i, 1).text())
+            fpath = self.table.item(i, 0).text()
             table_time = self.table.item(i, 1).text()
-            match = table_time.find(time_now)
-            if(match == 0):
-                self.player.play(self.playlist, i, self.playOption)
-                time.sleep(1)
-                print('play')
+            wr.writerow([i, fpath, table_time])
+
         #print(self.table.item(self.selectedList[0], 1).text())
 
+        f.close()
 
     def volumeChanged(self):
         self.player.upateVolume(self.slider.value())

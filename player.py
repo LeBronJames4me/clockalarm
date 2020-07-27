@@ -59,7 +59,5 @@ class CPlayer:
             self.parent.updateDurationChanged(self.playlist.currentIndex(), msec)
 
     def positionChanged(self, msec): #processbar
-        print('currentIndex1 = ',self.playlist.currentIndex(),'msec = ',msec)
         if msec > 0:
-            print('currentIndex2 = ', self.playlist.currentIndex(),'msec = ',msec)
             self.parent.updatePositionChanged(self.playlist.currentIndex(), msec)
