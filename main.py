@@ -43,7 +43,7 @@ class CWidget(QWidget):
 
 
 
-        self.setWindowTitle('Rhyme Sound')
+        self.setWindowTitle('Soundtrack Player')
         self.setWindowIcon(QIcon('ci.png'))
         self.setGeometry(200,170,900,600)
         self.initUI()
@@ -73,13 +73,26 @@ class CWidget(QWidget):
         hbox = QHBoxLayout()
         btnAdd = QPushButton('Add List')
         btnDel = QPushButton('Del List')
-        btnLoad = QPushButton('Load Setting')
+        btnLoad = QPushButton('Reset List')
         btnAdd.clicked.connect(self.addList)
         btnDel.clicked.connect(self.delList)
         btnLoad.clicked.connect(self.loadList)
         hbox.addWidget(btnAdd)
         hbox.addWidget(btnDel)
         hbox.addWidget(btnLoad)
+
+        f = open('settings.csv', 'r', encoding='utf-8')
+        rdr = csv.reader(f)
+
+        for line in rdr:
+            row = self.table.rowCount()
+            self.table.setRowCount(1 + row)
+            i = int(line[0])
+            self.table.setItem(i, 0, QTableWidgetItem(line[1]))
+            self.table.setItem(i, 1, QTableWidgetItem(line[2]))
+            self.table.setItem(i, 2, QTableWidgetItem(''))
+        f.close()
+        self.createPlaylist()
 
 
         box.addLayout(hbox)
@@ -134,12 +147,16 @@ class CWidget(QWidget):
         box = QHBoxLayout()
         gb = QGroupBox('현재 시각')
         vbox.addWidget(gb)
-
         box.addWidget(self.hour)
-
         self.showtime()
         gb.setLayout(box)
 
+        copyright = QLabel('Copyrightⓒ 2020. KNU CSE 서재현. All rights reserved®')
+        vbox.addWidget(copyright)
+        vbox.addWidget(QLabel('☎ 010 9126 5478'))
+        vbox.addWidget(QLabel('☞ veritasluxmea1234@gmail.com'))
+
+        #show 함수
         self.setLayout(vbox)
         self.show()
 
@@ -195,7 +212,7 @@ class CWidget(QWidget):
         self.createPlaylist()
 
     def loadList(self):
-
+        """
         f = open('settings.csv', 'r', encoding='utf-8')
         rdr = csv.reader(f)
 
@@ -207,6 +224,12 @@ class CWidget(QWidget):
             self.table.setItem(i, 1, QTableWidgetItem(line[2]))
             self.table.setItem(i, 2, QTableWidgetItem(''))
         f.close()
+        self.createPlaylist()
+        """
+        row=self.table.rowCount()
+        for i in range(0,row):
+            self.table.removeRow(0)
+
         self.createPlaylist()
 
 
